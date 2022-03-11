@@ -32,14 +32,15 @@ nloptions = nlmpcmoveopt;
 nloptions.Parameters = {Ts};
 
 Duration = 10;
-xHistory = x;
-Duration/Ts
-for ct = 1:(Duration/Ts)
-    ct
+tLength = Duration/Ts;
+xHistory = zeros(length(x(:,1)), tLength);
+xHistory(:, 1) = x0;
+for t = 1:tLength
+    t
     % Correct previous prediction
     xk = correct(EKF,y);
     % Compute optimal control moves
-    yref = xypath(ct,:);
+    yref = xypath(t,:);
     [mv,nloptions] = nlmpcmove(nlobj,xk,mv,yref,[],nloptions);
     % Predict prediction model states for the next iteration
     predict(EKF,[mv; Ts]);
@@ -48,8 +49,10 @@ for ct = 1:(Duration/Ts)
     % Generate sensor data (with noise)
     y = x([1 2]) + randn(2,1)*0.01;
     % Save plant states
-    xHistory = [xHistory x];
+    xHistory(:, t + 1) = x;
 end
+
+save ("xHistory", "xHistory");
 
 %%
 
