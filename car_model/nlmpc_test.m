@@ -11,29 +11,31 @@ nlobj.Ts = Ts;
 nlobj.PredictionHorizon = 20;
 nlobj.ControlHorizon = 5;
 
-nlobj.Model.StateFcn = "carDT";
+nlobj.Model.StateFcn = "carDT"; % give discrete car model
 nlobj.Model.IsContinuousTime = false;
 nlobj.Model.NumberOfParameters = 1;
 nlobj.Model.OutputFcn = @(x,u,Ts) [x(1); x(2)]; % x, y
 
+% initial values for x, u
 x0 = [0; 0; 0];
 u0 = [0; 0];
 validateFcns(nlobj, x0, u0, [], {Ts});
 
+% Kalman filter to estimate car state in executing
 EKF = extendedKalmanFilter(@carStateFcn,@carMeasurementFcn);
 x = x0
 y = x0(1:2);
 EKF.State = x;
 mv = [0; 0];
 
-load('xypath.mat');
+load('xypath.mat'); % reference car (x,y) path
 
 nloptions = nlmpcmoveopt;
 nloptions.Parameters = {Ts};
 
-Duration = 10;
+Duration = 10; % simulation time
 tLength = Duration/Ts;
-xHistory = zeros(length(x(:,1)), tLength);
+xHistory = zeros(length(x(:,1)), tLength); % x state result
 xHistory(:, 1) = x0;
 for t = 1:tLength
     t
