@@ -23,20 +23,21 @@ validateFcns(nlobj, x0, u0, [], {Ts});
 
 % Kalman filter to estimate car state in executing
 EKF = extendedKalmanFilter(@carStateFcn,@carMeasurementFcn);
-x = x0
+x = x0;
 y = x0(1:2);
-EKF.State = x;
-mv = [0; 0];
+EKF.State = x; % initial value for EKF
+mv = [0; 0]; % = u (v; delta)
+
+nloptions = nlmpcmoveopt; % object of options for MPC
+nloptions.Parameters = {Ts};
 
 load('xypath.mat'); % reference car (x,y) path
-
-nloptions = nlmpcmoveopt;
-nloptions.Parameters = {Ts};
 
 Duration = 10; % simulation time
 tLength = Duration/Ts;
 xHistory = zeros(length(x(:,1)), tLength); % x state result
 xHistory(:, 1) = x0;
+
 for t = 1:tLength
     t
     % Correct previous prediction
@@ -58,6 +59,7 @@ save ("xHistory", "xHistory");
 
 %%
 
+load("xHistory.mat");
 figure;
 plot(xypath(:,1), xypath(:,2));
 hold on;

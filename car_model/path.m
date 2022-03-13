@@ -1,7 +1,7 @@
 clear all;
 clc;
 
-xy = [0, 0;
+xy = [0, 0; % (x,y) points where car moves
       5, 0;
       8, 2;
       5, 6;
@@ -16,6 +16,7 @@ xy = [0, 0;
 p = 1:length(xy(:,1));
 q = 1:0.05:length(xy(:,1));
 
+% create car trajectory via xy points
 x = spline(p, xy(:,1), q);
 y = spline(p, xy(:,2), q);
 
@@ -23,5 +24,8 @@ xypath = [x', y'];
 
 figure;
 plot(xypath(:,1), xypath(:,2));
+title("car reference trajectory");
+xlabel("x");
+ylabel("y");
 
 save('xypath', 'xypath');
